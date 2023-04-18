@@ -141,7 +141,6 @@ if __name__ == "__main__":
             validation_losses.append(loss_val/len(val_dataset_loader))
             
             print("val1=",validation_accuracies1,"val2 =",validation_accuracies2,"loss =",validation_losses)
-        break
     print(np.mean(validation_accuracies1), np.mean(validation_accuracies2), np.mean(validation_losses))
 # hyperparameters = epochs, no of layers, learning rate, regularization param
 
