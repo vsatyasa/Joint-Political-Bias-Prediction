@@ -11,7 +11,7 @@ from transformers import BertModel
 class LSTM(torch.nn.Module):
     # Input - encoded sentence 
     # Output - bias
-    def __init__(self, embedding, version, n_hiddel_layer = 100):
+    def __init__(self, embedding, version, n_hiddel_layer = 100, attribute):
         super(LSTM, self).__init__()
         self.version = version
         self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('cuda'))
@@ -22,7 +22,12 @@ class LSTM(torch.nn.Module):
         if version == 'baseline':
             self.fc1 = torch.nn.Linear(n_hiddel_layer, 3)
         elif version == 'joint_class':
-            self.fc1 = torch.nn.Linear(n_hiddel_layer, 6)
+            if attribute == 'source':
+                self.fc1 = torch.nn.Linear(n_hiddel_layer, 149)
+            elif attribute == 'topic':
+                self.fc1 = torch.nn.Linear(n_hiddel_layer, 291)
+            else:
+                self.fc1 = torch.nn.Linear(n_hiddel_layer, 6)
 
         self.relu = torch.nn.ReLU()
         self.softmax = torch.nn.Softmax(dim=1)
@@ -40,7 +45,7 @@ class LSTM(torch.nn.Module):
 class LSTM_double_fc(torch.nn.Module):
     # Input - encoded sentence 
     # Output - bias
-    def __init__(self, embedding, version, n_hiddel_layer = 100):
+    def __init__(self, embedding, version, n_hiddel_layer, attribute):
         super(LSTM_double_fc, self).__init__()
             
         self.version = version
@@ -50,7 +55,12 @@ class LSTM_double_fc(torch.nn.Module):
         self.lstm = torch.nn.LSTM(50*sentence_length, n_hiddel_layer)
         
         self.fc1 = torch.nn.Linear(n_hiddel_layer, 3)
-        self.fc2 = torch.nn.Linear(n_hiddel_layer, 2)
+        if attribute == 'source':
+            self.fc2 = torch.nn.Linear(n_hiddel_layer, 149)
+        elif attribute == 'topic':
+            self.fc2 = torch.nn.Linear(n_hiddel_layer, 105)
+        else:
+            self.fc2 = torch.nn.Linear(n_hiddel_layer, 2)
         
         self.relu = torch.nn.ReLU()
         self.softmax = torch.nn.Softmax(dim=1)
@@ -69,7 +79,7 @@ class LSTM_double_fc(torch.nn.Module):
 class BERT(torch.nn.Module):
     # Input - encoded sentence 
     # Output - bias
-    def __init__(self, embedding, version):
+    def __init__(self, embedding, version, attribute):
         super(BERT, self).__init__()
             
         self.version = version
@@ -86,7 +96,12 @@ class BERT(torch.nn.Module):
         if version == 'baseline':
             self.fc1 = torch.nn.Linear(n_hiddel_layer, 3)
         elif version == 'joint_class':
-            self.fc1 = torch.nn.Linear(n_hiddel_layer, 6)
+            if attribute == 'source':
+                self.fc1 = torch.nn.Linear(n_hiddel_layer, 149)
+            elif attribute == 'topic':
+                self.fc1 = torch.nn.Linear(n_hiddel_layer, 291)
+            else:
+                self.fc1 = torch.nn.Linear(n_hiddel_layer, 6)
 
         self.relu = torch.nn.ReLU()
         self.softmax = torch.nn.Softmax(dim=1)
@@ -102,7 +117,7 @@ class BERT(torch.nn.Module):
 class BERT_double_fc(torch.nn.Module):
     # Input - encoded sentence 
     # Output - bias
-    def __init__(self, embedding, version):
+    def __init__(self, embedding, version, attribute):
         super(BERT_double_fc, self).__init__()
             
         self.version = version
@@ -116,7 +131,12 @@ class BERT_double_fc(torch.nn.Module):
         self.bert = BertModel.from_pretrained('bert-base-cased')
         
         self.fc1 = torch.nn.Linear(n_hiddel_layer, 3)
-        self.fc2 = torch.nn.Linear(n_hiddel_layer, 2)
+        if attribute == 'source':
+            self.fc2 = torch.nn.Linear(n_hiddel_layer, 149)
+        elif attribute == 'topic':
+            self.fc2 = torch.nn.Linear(n_hiddel_layer, 105)
+        else:
+            self.fc2 = torch.nn.Linear(n_hiddel_layer, 2)
         
         self.relu = torch.nn.ReLU()
         self.softmax = torch.nn.Softmax(dim=1)

@@ -73,7 +73,7 @@ class WiCDataset(Dataset):
             self.text_data = pd.read_csv('preprocessed.csv')
             
             self.text_data['glove_encoded_content'] = self.text_data['glove_encoded_content'].apply(literal_eval)
-            self.text_data['one_hot_topics'] = self.text_data['one_hot_topics'].apply(literal_eval)
+            self.text_data['one_hot_topic'] = self.text_data['one_hot_topic'].apply(literal_eval)
             self.text_data['one_hot_source'] = self.text_data['one_hot_source'].apply(literal_eval)
             self.text_data['one_hot_bias'] = self.text_data['one_hot_bias'].apply(literal_eval)
             self.text_data['one_hot_sentiment'] = self.text_data['one_hot_sentiment'].apply(literal_eval)
@@ -88,16 +88,20 @@ class WiCDataset(Dataset):
 
             self.vocab = Vocab(self.glove_file, self.text_data)
             self.text_data['glove_encoded_content'] = self.text_data['_content'].apply(self.vocab.build_idx_sequence)
-            self.text_data['one_hot_topics'] = pd.get_dummies(self.text_data['topic']).values.tolist()
+            self.text_data['one_hot_topic'] = pd.get_dummies(self.text_data['topic']).values.tolist()
             self.text_data['one_hot_source'] = pd.get_dummies(self.text_data['source']).values.tolist()
             self.text_data['one_hot_bias'] = pd.get_dummies(self.text_data['bias']).values.tolist()
             self.text_data['one_hot_sentiment'] = pd.get_dummies(self.text_data['final_label']).values.tolist()
             self.text_data['one_hot_bias_sentiment'] = pd.get_dummies(self.text_data['final_label'].astype(str) + self.text_data['bias'].astype(str)).values.tolist()
+            self.text_data['one_hot_bias_topic'] = pd.get_dummies(self.text_data['topic'].astype(str) + self.text_data['bias'].astype(str)).values.tolist()
+            self.text_data['one_hot_bias_source'] = pd.get_dummies(self.text_data['source'].astype(str) + self.text_data['bias'].astype(str)).values.tolist()
             self.text_data[['one_hot_bias_sentiment',
+                            'one_hot_bias_topic',
+                            'one_hot_bias_source',
                             'one_hot_sentiment',
                             'one_hot_bias',
                             'one_hot_source',
-                            'one_hot_topics',
+                            'one_hot_topic',
                             'glove_encoded_content',
                             'content']].to_csv('preprocessed.csv')
         self.text_data['bert_encoded_content'] = self.text_data['content'].apply(lambda text: bert_tokenizer(text, 
@@ -154,10 +158,12 @@ class WiCDataset(Dataset):
     def __getitem__(self, idx):
         return {
             'glove_encoded_content': torch.tensor(self.text_data['glove_encoded_content'].iloc[idx]),
-            'one_hot_topics': torch.tensor(self.text_data['one_hot_topics'].iloc[idx]),
+            'one_hot_topic': torch.tensor(self.text_data['one_hot_topic'].iloc[idx]),
             'one_hot_source': torch.tensor(self.text_data['one_hot_source'].iloc[idx]),
             'one_hot_bias': torch.FloatTensor(self.text_data['one_hot_bias'].iloc[idx]),
             'one_hot_sentiment': torch.tensor(self.text_data['one_hot_sentiment'].iloc[idx]),
             'one_hot_bias_sentiment': torch.FloatTensor(self.text_data['one_hot_bias_sentiment'].iloc[idx]),
+            'one_hot_bias_topic': torch.FloatTensor(self.text_data['one_hot_bias_topic'].iloc[idx]),
+            'one_hot_bias_source': torch.FloatTensor(self.text_data['one_hot_bias_source'].iloc[idx]),
             'bert_encoded_content': self.text_data['bert_encoded_content'].iloc[idx]
         }

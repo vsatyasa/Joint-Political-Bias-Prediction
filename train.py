@@ -63,6 +63,7 @@ if __name__ == "__main__":
     parser.add_argument('--hidden_nodes', default=10, type=int)
     parser.add_argument('--learning_rate', default=0.00001, type=float)
     parser.add_argument('--version', choices=['baseline', 'separate_class', 'joint_class'], default='baseline', type=str)
+    parser.add_argument('--attribute', choices=['sentiment', 'topic', 'source'], default='sentiment', type=str)
 
     args = parser.parse_args()
     print(args)
@@ -80,9 +81,19 @@ if __name__ == "__main__":
     if args.version == 'baseline':
         fn = lambda x: x['one_hot_bias']
     elif args.version == 'separate_class':
-       fn = lambda x: torch.cat([x['one_hot_bias'], x['one_hot_sentiment']], axis = 1)
+        if args.attribute == 'sentiment':
+            fn = lambda x: torch.cat([x['one_hot_bias'], x['one_hot_sentiment']], axis = 1)
+        elif args.attribute == 'topic':
+            fn = lambda x: torch.cat([x['one_hot_bias'], x['one_hot_topic']], axis = 1)
+        else:
+            fn = lambda x: torch.cat([x['one_hot_bias'], x['one_hot_source']], axis = 1)
     elif args.version == 'joint_class':
-        fn = lambda x: x['one_hot_bias_sentiment']
+        if args.attribute == 'sentiment':
+            fn = lambda x: x['one_hot_bias_sentiment']
+        elif args.attribute == 'topic':
+            fn = lambda x: x['one_hot_bias_topic']
+        else:
+            fn = lambda x: x['one_hot_bias_source']
 
     kf = KFold(n_splits=5)
     
@@ -97,15 +108,15 @@ if __name__ == "__main__":
 
         if args.model == 'lstm': 
             if args.version == 'separate_class':
-                model = LSTM_double_fc(glove_embs, args.version, args.hidden_nodes).to(torch_device)
+                model = LSTM_double_fc(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
             else:
-                model = LSTM(glove_embs, args.version, args.hidden_nodes).to(torch_device)
+                model = LSTM(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
         else:
             if args.version == 'separate_class':
-                model = BERT_double_fc(glove_embs, args.version).to(torch_device)
+                model = BERT_double_fc(glove_embs, args.version, args.attribute).to(torch_device)
                 pass
             else:
-                model = BERT(glove_embs, args.version).to(torch_device)
+                model = BERT(glove_embs, args.version, args.attribute).to(torch_device)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
         
         for epoch in range(epochs):
@@ -124,7 +135,7 @@ if __name__ == "__main__":
                 result = fn(data.to(torch_device))
                 if torch.argmax(pred[:,:3]) == torch.argmax(result[:,:3]):
                     acc1+=1
-                if torch.argmax(pred[:,-2:]) == torch.argmax(result[:,-2:]):
+                if torch.argmax(pred[:,3:]) == torch.argmax(result[:,3:]):
                     acc2+=1
             validation_accuracies1.append(acc1/len(val_dataset_loader))
             validation_accuracies2.append(acc2/len(val_dataset_loader))
@@ -140,7 +151,8 @@ if __name__ == "__main__":
             validation_accuracies1.append(acc/len(val_dataset_loader))
             validation_losses.append(loss_val/len(val_dataset_loader))
             
-            print("val1=",validation_accuracies1,"val2 =",validation_accuracies2,"loss =",validation_losses)
+        print("val1=",validation_accuracies1,"val2 =",validation_accuracies2,"loss =",validation_losses)
+        break
     print(np.mean(validation_accuracies1), np.mean(validation_accuracies2), np.mean(validation_losses))
 # hyperparameters = epochs, no of layers, learning rate, regularization param
 
