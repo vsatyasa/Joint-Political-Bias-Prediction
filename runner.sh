@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define arrays of values for each argument
-models=("bert")
-epochs=(50)
-hidden_nodes=(25 50 100 200)
-learning_rates=(0.001)
+models=("lstm")
+epochs=(10 20 50)
+hidden_nodes=(25 50 100 200 300 500)
+learning_rates=(0.001 0.0001 0.00001)
 versions=("baseline" "separate_class" "joint_class")
 
 # Iterate over all combinations of argument values and run the Python file
@@ -21,6 +21,7 @@ for model in "${models[@]}"; do
             --hidden_nodes "$node" \
             --learning_rate "$lr" \
             --version "$version" 
+          echo "\n"
         done
       done
     done

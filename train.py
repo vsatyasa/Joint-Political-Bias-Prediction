@@ -9,26 +9,27 @@ import numpy as np
 np.random.seed(577)
 import warnings
 import torch
-from GPUtil import showUtilization as gpu_usage
-from numba import cuda
+# from GPUtil import showUtilization as gpu_usage
+# from numba import cuda
 
-def free_gpu_cache():
-    print("Initial GPU Usage")
-    gpu_usage()                             
+# def free_gpu_cache():
+#     print("Initial GPU Usage")
+#     gpu_usage()                             
 
-    torch.cuda.empty_cache()
+#     torch.cuda.empty_cache()
 
-    cuda.select_device(0)
-    cuda.close()
-    cuda.select_device(0)
+#     cuda.select_device(0)
+#     cuda.close()
+#     cuda.select_device(0)
 
-    print("GPU Usage after emptying the cache")
-    gpu_usage()
+#     print("GPU Usage after emptying the cache")
+#     gpu_usage()
 
-free_gpu_cache() 
-import gc
-gc.collect()
-torch.cuda.empty_cache()
+# free_gpu_cache() 
+# import gc
+# gc.collect()
+# torch.cuda.empty_cache()
+# torch.cuda.empty_cache()
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -36,7 +37,7 @@ import torch
 torch.set_default_tensor_type(torch.FloatTensor)
 torch.use_deterministic_algorithms(True)
 torch.manual_seed(577)
-torch_device = torch.device("cuda")
+torch_device = torch.device("mps")
 from sklearn.model_selection import KFold
 
 '''
@@ -53,7 +54,7 @@ from neural_archs import LSTM, LSTM_double_fc, BERT, BERT_double_fc
 from utils import WiCDataset
 import pandas as pd
 from sklearn.model_selection import KFold
-torch.cuda.empty_cache()
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -110,9 +111,9 @@ if __name__ == "__main__":
         
         if args.model == 'lstm': 
             if args.version == 'separate_class':
-                model = LSTM_double_fc(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
+                model = LSTM_double_fc(glove_embs, args.version, args.attribute, args.hidden_nodes).to(torch_device)
             else:
-                model = LSTM(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
+                model = LSTM(glove_embs, args.version, args.attribute, args.hidden_nodes).to(torch_device)
         else:
             if args.version == 'separate_class':
                 model = BERT_double_fc(glove_embs, args.version, args.attribute).to(torch_device)
@@ -120,19 +121,6 @@ if __name__ == "__main__":
                 model = BERT(glove_embs, args.version, args.attribute).to(torch_device)
 
 
-        # if args.model == 'lstm': 
-        #     if args.version == 'separate_class':
-
-        #         model = LSTM_double_fc(glove_embs, args.version, n_hiddel_layer=args.hidden_nodes, attribute=args.attribute).to(torch_device)
-
-        #     else:
-        #         model = LSTM(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
-        # else:
-        #     if args.version == 'separate_class':
-        #         model = BERT_double_fc(glove_embs, args.version, args.attribute).to(torch_device)
-        #         pass
-        #     else:
-        #         model = BERT(glove_embs, args.version, args.attribute).to(torch_device)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
         
         for epoch in range(epochs):

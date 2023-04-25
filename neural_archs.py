@@ -14,8 +14,8 @@ class LSTM(torch.nn.Module):
     def __init__(self, embedding, version, attribute, n_hiddel_layer = 100):
         super(LSTM, self).__init__()
         self.version = version
-        self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('cuda'))
-        # self.embedding.cuda()
+        self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('mps'))
+        # self.embedding.mps()
         sentence_length = 484
         self.lstm = torch.nn.LSTM(50*sentence_length, n_hiddel_layer)
         
@@ -35,7 +35,7 @@ class LSTM(torch.nn.Module):
     def forward(self, x):
         # TODO: Implement LSTM forward pass
         ip = x['glove_encoded_content']
-        o_embedding = self.embedding(x['glove_encoded_content'].to(torch.device("cuda"))).view((len(ip),-1))
+        o_embedding = self.embedding(x['glove_encoded_content'].to(torch.device("mps"))).view((len(ip),-1))
         lstm, _ = self.lstm(o_embedding)
         relu = self.relu(lstm)
         fc1 = self.fc1(relu)
@@ -50,7 +50,7 @@ class LSTM_double_fc(torch.nn.Module):
             
         self.version = version
         
-        self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('cuda'))
+        self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('mps'))
         sentence_length = 484
         self.lstm = torch.nn.LSTM(50*sentence_length, n_hiddel_layer)
         
@@ -68,7 +68,7 @@ class LSTM_double_fc(torch.nn.Module):
     def forward(self, x):
         # TODO: Implement LSTM forward pass
         ip = x['glove_encoded_content']
-        o_embedding = self.embedding(x['glove_encoded_content']).to(torch.device('cuda')).view((len(ip),-1))
+        o_embedding = self.embedding(x['glove_encoded_content']).to(torch.device('mps')).view((len(ip),-1))
         lstm, _ = self.lstm(o_embedding)
         relu = self.relu(lstm)
         fc1 = self.fc1(relu)
@@ -108,7 +108,7 @@ class BERT(torch.nn.Module):
 
     def forward(self, x):
         # TODO: Implement LSTM forward pass
-        _, bert = self.bert(input_ids= x['bert_encoded_content']['input_ids'].view(-1, x['bert_encoded_content']['input_ids'].shape[-1]).to(torch.device('cuda')), attention_mask=x['bert_encoded_content']['attention_mask'].view(-1, x['bert_encoded_content']['attention_mask'].shape[-1]).to(torch.device('cuda')),return_dict=False)
+        _, bert = self.bert(input_ids= x['bert_encoded_content']['input_ids'].view(-1, x['bert_encoded_content']['input_ids'].shape[-1]).to(torch.device('mps')), attention_mask=x['bert_encoded_content']['attention_mask'].view(-1, x['bert_encoded_content']['attention_mask'].shape[-1]).to(torch.device('mps')),return_dict=False)
 
         relu = self.relu(bert)
         fc1 = self.fc1(relu)
@@ -144,7 +144,7 @@ class BERT_double_fc(torch.nn.Module):
     def forward(self, x):
         # TODO: Implement LSTM forward pass
         
-        _, bert = self.bert(input_ids= x['bert_encoded_content']['input_ids'].view(-1, x['bert_encoded_content']['input_ids'].shape[-1]).to(torch.device('cuda')), attention_mask=x['bert_encoded_content']['attention_mask'].view(-1, x['bert_encoded_content']['attention_mask'].shape[-1]).to(torch.device('cuda')),return_dict=False)
+        _, bert = self.bert(input_ids= x['bert_encoded_content']['input_ids'].view(-1, x['bert_encoded_content']['input_ids'].shape[-1]).to(torch.device('mps')), attention_mask=x['bert_encoded_content']['attention_mask'].view(-1, x['bert_encoded_content']['attention_mask'].shape[-1]).to(torch.device('mps')),return_dict=False)
 
         relu = self.relu(bert)
         fc1 = self.fc1(relu)
