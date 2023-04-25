@@ -11,7 +11,7 @@ from transformers import BertModel
 class LSTM(torch.nn.Module):
     # Input - encoded sentence 
     # Output - bias
-    def __init__(self, embedding, version, n_hiddel_layer = 100, attribute):
+    def __init__(self, embedding, version, attribute, n_hiddel_layer = 100):
         super(LSTM, self).__init__()
         self.version = version
         self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('cuda'))
