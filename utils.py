@@ -6,6 +6,7 @@ import nltk
 import numpy as np
 import torch.nn as nn
 import torch.optim as optim
+import ast
 from collections import Counter
 import gensim.downloader as api
 from nltk.corpus import words
@@ -155,7 +156,12 @@ class WiCDataset(Dataset):
             return 0
         return 1 
     
+    
     def __getitem__(self, idx):
+        #print(type(self.text_data['one_hot_bias_topic'].iloc[idx]))
+        numeric_data = ast.literal_eval(self.text_data['one_hot_bias_topic'].iloc[idx])
+        numeric_data_source = ast.literal_eval(self.text_data['one_hot_bias_source'].iloc[idx])
+
         return {
             'glove_encoded_content': torch.tensor(self.text_data['glove_encoded_content'].iloc[idx]),
             'one_hot_topic': torch.tensor(self.text_data['one_hot_topic'].iloc[idx]),
@@ -163,7 +169,8 @@ class WiCDataset(Dataset):
             'one_hot_bias': torch.FloatTensor(self.text_data['one_hot_bias'].iloc[idx]),
             'one_hot_sentiment': torch.tensor(self.text_data['one_hot_sentiment'].iloc[idx]),
             'one_hot_bias_sentiment': torch.FloatTensor(self.text_data['one_hot_bias_sentiment'].iloc[idx]),
-            'one_hot_bias_topic': torch.FloatTensor(self.text_data['one_hot_bias_topic'].iloc[idx]),
-            'one_hot_bias_source': torch.FloatTensor(self.text_data['one_hot_bias_source'].iloc[idx]),
+             
+            'one_hot_bias_topic': torch.FloatTensor(numeric_data),
+            'one_hot_bias_source': torch.FloatTensor(numeric_data_source),
             'bert_encoded_content': self.text_data['bert_encoded_content'].iloc[idx]
         }
