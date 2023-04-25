@@ -148,7 +148,7 @@ if __name__ == "__main__":
             for data in val_dataset_loader:
                 pred = model(data)
                 loss_val += loss_fn(pred.to(torch_device), fn(data).to(torch_device)).item()
-                result = fn(data.to(torch_device))
+                result = fn(data)
                 if torch.argmax(pred[:,:3]) == torch.argmax(result[:,:3]):
                     acc1+=1
                 if torch.argmax(pred[:,3:]) == torch.argmax(result[:,3:]):
