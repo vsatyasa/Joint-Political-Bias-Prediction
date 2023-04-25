@@ -97,6 +97,8 @@ if __name__ == "__main__":
 
     kf = KFold(n_splits=5)
     
+
+    
     validation_accuracies1 = []
     validation_accuracies2 = []
     validation_losses = []
@@ -105,7 +107,7 @@ if __name__ == "__main__":
         val_sampler = torch.utils.data.SubsetRandomSampler(val_idx)
         train_dataset_loader = torch.utils.data.DataLoader(train_dataset, batch_size=10, sampler=train_sampler)
         val_dataset_loader = torch.utils.data.DataLoader(train_dataset, batch_size=1, sampler=val_sampler)
-
+        
         if args.model == 'lstm': 
             if args.version == 'separate_class':
                 model = LSTM_double_fc(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
@@ -114,9 +116,23 @@ if __name__ == "__main__":
         else:
             if args.version == 'separate_class':
                 model = BERT_double_fc(glove_embs, args.version, args.attribute).to(torch_device)
-                pass
             else:
                 model = BERT(glove_embs, args.version, args.attribute).to(torch_device)
+
+
+        # if args.model == 'lstm': 
+        #     if args.version == 'separate_class':
+
+        #         model = LSTM_double_fc(glove_embs, args.version, n_hiddel_layer=args.hidden_nodes, attribute=args.attribute).to(torch_device)
+
+        #     else:
+        #         model = LSTM(glove_embs, args.version, args.hidden_nodes, args.attribute).to(torch_device)
+        # else:
+        #     if args.version == 'separate_class':
+        #         model = BERT_double_fc(glove_embs, args.version, args.attribute).to(torch_device)
+        #         pass
+        #     else:
+        #         model = BERT(glove_embs, args.version, args.attribute).to(torch_device)
         optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
         
         for epoch in range(epochs):
@@ -154,6 +170,8 @@ if __name__ == "__main__":
         print("val1=",validation_accuracies1,"val2 =",validation_accuracies2,"loss =",validation_losses)
         break
     print(np.mean(validation_accuracies1), np.mean(validation_accuracies2), np.mean(validation_losses))
+    with open('vishal_result.txt', 'w') as result_file:
+        result_file.write(f"{np.mean(validation_accuracies1)} {np.mean(validation_accuracies2)} {np.mean(validation_losses)}\n")
 # hyperparameters = epochs, no of layers, learning rate, regularization param
 
 # Output - bias_accuracy sentiment_accuracy loss
