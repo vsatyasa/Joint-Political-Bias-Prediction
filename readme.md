@@ -10,5 +10,6 @@ conda install --file requirements.txt
 ```
 python train.py [model='lstm'] [epochs=50] [hidden_nodes=20] [learning_rate=0.0001] [version='baseline']
 ```
+Batch run for multiple combinations of parameters can be performed using the runner.sh script
 
 This project was developerd with Python version 3.7.16
