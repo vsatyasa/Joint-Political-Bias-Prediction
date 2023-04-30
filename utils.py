@@ -17,9 +17,6 @@ from transformers import BertTokenizer
 
 bert_tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 
-# nltk.download('wordnet')
-## save the network call delay
-## by init the stop words manually
 NLTK_STOP_WORDS = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", 
                    "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 
                    'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 
@@ -158,7 +155,6 @@ class WiCDataset(Dataset):
     
     
     def __getitem__(self, idx):
-        #print(type(self.text_data['one_hot_bias_topic'].iloc[idx]))
         numeric_data = ast.literal_eval(self.text_data['one_hot_bias_topic'].iloc[idx])
         numeric_data_source = ast.literal_eval(self.text_data['one_hot_bias_source'].iloc[idx])
 

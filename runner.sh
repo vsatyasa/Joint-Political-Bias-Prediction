@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Define arrays of values for each argument
-models=("bert")
+models=("lstm")
 epochs=(50)
-hidden_nodes=(25 50 100 200)
+hidden_nodes=(100 200)
 learning_rates=(0.001)
 versions=("baseline" "separate_class" "joint_class")
 
@@ -13,8 +13,6 @@ for model in "${models[@]}"; do
     for node in "${hidden_nodes[@]}"; do
       for lr in "${learning_rates[@]}"; do
         for version in "${versions[@]}"; do
-          output_file="${model}_${node}_${version}.txt"
-          echo $output_file
           python train.py \
             --model "$model" \
             --epochs "$epoch" \

@@ -15,7 +15,7 @@ class LSTM(torch.nn.Module):
         super(LSTM, self).__init__()
         self.version = version
         self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors)).to(torch.device('cuda'))
-        # self.embedding.cuda()
+
         sentence_length = 484
         self.lstm = torch.nn.LSTM(50*sentence_length, n_hiddel_layer)
         
@@ -84,10 +84,6 @@ class BERT(torch.nn.Module):
             
         self.version = version
         
-        # self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors))
-        # sentence_length = 484
-        # self.lstm = torch.nn.LSTM(50*sentence_length, n_hiddel_layer)
-        
         # Bert's o/p is 768
         n_hiddel_layer = 768
         
@@ -121,10 +117,6 @@ class BERT_double_fc(torch.nn.Module):
         super(BERT_double_fc, self).__init__()
             
         self.version = version
-        
-        # self.embedding = torch.nn.Embedding.from_pretrained(torch.FloatTensor(embedding.vectors))
-        # sentence_length = 484
-        # self.lstm = torch.nn.LSTM(50*sentence_length, n_hiddel_layer)
         
         n_hiddel_layer = 768
         
